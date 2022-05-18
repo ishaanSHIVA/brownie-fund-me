@@ -1,8 +1,28 @@
-from brownie import network, accounts, config
+from brownie import network, accounts, config, MockV3Aggregator
+from web3 import Web3
+
+FORKED_LOCAL_ENVIRONMENTS = ["mainnet-fork", "mainnet-fork-dev"]
+LOCAL_BLOCKCHAIN_ENVIRONMENTS = ["development", "ganache-local"]
+
+DECIMALS = 8
+STARTING_PRICE = 2 * 10**8
+
+
+def deployMocks():
+    print("Active network is in development mode")
+    print("Deploying Mocks!!!")
+    if len(MockV3Aggregator) <= 0:
+
+        mockV3Aggregator = MockV3Aggregator.deploy(
+            DECIMALS, STARTING_PRICE, {"from": get_account()}
+        )
 
 
 def get_account():
-    if network.show_active() == "development":
+    if (
+        network.show_active() in LOCAL_BLOCKCHAIN_ENVIRONMENTS
+        or network.show_active() in FORKED_LOCAL_ENVIRONMENTS
+    ):
         return accounts[0]
 
     return accounts.add(config["wallets"]["from_key"])
